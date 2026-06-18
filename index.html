@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calculadora AC4 – 5° CRPM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* Reset básico para evitar quebras de layout */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --verde: #006B3C;
+      --verde-hover: #00522e;
+      --verde-light: #e6f1ec;
+      --amarelo: #FFD700;
+      --amarelo-hover: #e6c200;
+      --vermelho: #C1121F;
+      --vermelho-hover: #9c0e18;
+      --preto: #1e293b; /* Tom chumbo mais moderno que o preto puro */
+      --cinza: #f8fafc; /* Fundo limpo e suave */
+      --border: #e2e8f0;
+    }
+    
+    body {
+      padding: 30px 20px;
+      font-family: 'Inter', sans-serif;
+      background: var(--cinza);
+      color: var(--preto);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Container para limitar a largura num ecrã grande */
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    header img {
+      width: 110px;
+      height: auto;
+      margin-bottom: 14px;
+    }
+    
+    header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--preto);
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    
+    header h2 {
+      font-size: 16px;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    
+    header h6 {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    .botao-pdf {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background-color: #ef4444;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+    }
+
+    .botao-pdf:hover {
+      background-color: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 10px -1px rgba(239, 68, 68, 0.3);
+    }
+
+    .botao-pdf:active {
+      transform: translateY(0);
+    }
+
+    /* Cartões Modernos (Glassmorphism sutil) */
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03), 0 10px 15px -3px rgba(0,0,0,0.05);
+      border-top: 5px solid var(--verde);
+    }
+    
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: block;
+      color: #475569;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--preto);
+      background-color: #fff;
+      transition: all 0.2s ease;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--verde);
+      box-shadow: 0 0 0 4px rgba(0, 107, 60, 0.12); /* Anel de foco moderno */
+    }
+    
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    
+    .ajuste {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .ajuste .btn-step {
+      width: 42px;
+      height: 42px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-minus { background: var(--vermelho); }
+    .btn-minus:hover { background: var(--vermelho-hover); }
+    
+    .btn-plus { background: var(--verde); }
+    .btn-plus:hover { background: var(--verde-hover); }
+    
+    .hour-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      height: 42px;
+      font-weight: 600;
+      font-size: 14px;
+      background: #f1f5f9;
+      color: #334155;
+    }
+    
+    /* Box de Prévia Clean */
+    .preview {
+      background: var(--verde-light);
+      border-left: 4px solid var(--verde);
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    .preview div:first-child {
+      font-size: 13px;
+      font-weight: 600;
+      color: #004d29;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .preview h3 {
+      margin: 6px 0;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--verde);
+    }
+
+    #previewInfo {
+      font-size: 13px;
+      color: #475569;
+    }
+    
+    .btn-primary {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      background: var(--amarelo);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+    }
+    
+    .btn-primary:hover {
+      background: var(--amarelo-hover);
+      box-shadow: 0 6px 16px rgba(255, 215, 0, 0.3);
+    }
+    
+    /* Tabelas Elegantes */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      text-align: center;
+    }
+    
+    thead th {
+      background: var(--verde);
+      color: #fff;
+      padding: 14px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    tbody td, tfoot td {
+      padding: 14px 12px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc; /* Hover na linha da tabela */
+    }
+    
+    tfoot td {
+      font-weight: 700;
+      background: #f1f5f9;
+      color: var(--preto);
+      border-top: 2px solid var(--border);
+    }
+    
+    .btn-del {
+      background: #fee2e2;
+      color: var(--vermelho);
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-del:hover {
+      background: var(--vermelho);
+      color: #fff;
+    }
+    
+    #btnPDF {
+      background: var(--preto); 
+      color: #fff;
+      margin-top: 10px;
+      padding: 14px;
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(30, 41, 59, 0.15);
+    }
+    
+    #btnPDF:hover {
+      background: #0f172a;
+    }
+
+    button:active {
+      transform: scale(0.98); /* Efeito de afundar a tecla */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <img src="img/brasao leve.png" alt="Brasão 5º CRPM" />
+      <h1>5° COMANDO REGIONAL</h1>
+      <h2>Calculadora AC4</h2>
+      <h6><em>Criado por CB Edilson</em></h6>
+      <a href="Portaria_AC4.pdf" target="_blank" class="botao-pdf">
+        <i class="fas fa-file-pdf"></i> Portaria AC4
+      </a>
+    </header>
+
+    <div class="card">
+      <label for="data">📅 Data do Trabalho</label>
+      <input type="date" id="data">
+
+      <div class="row">
+        <div>
+          <label for="horaInicio">⏵ Hora Inicial</label>
+          <select id="horaInicio"></select>
+        </div>
+        <div>
+          <label>⏳ Hora Final</label>
+          <div class="ajuste">
+            <button class="btn-step btn-minus" id="btnMenos">−</button>
+            <div class="hour-box"><span id="textoFim">até 08h (8h)</span></div>
+            <button class="btn-step btn-plus" id="btnMais">＋</button>
+          </div>
+          <input type="number" id="horaFim" value="8" hidden>
+        </div>
+      </div>
+
+      <div class="preview">
+        <div>👁️ Prévia da Consulta</div>
+        <h3 id="previewValor">R$ 0,00</h3>
+        <div id="previewInfo"></div>
+      </div>
+
+      <button class="btn-primary" id="btnAdd">＋ Adicionar Consulta</button>
+    </div>
+
+    <div class="card" style="padding:0; overflow: hidden;">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>DATA</th>
+              <th>DIA</th>
+              <th>HORÁRIO</th>
+              <th>HORAS</th>
+              <th>VALOR</th>
+              <th>AÇÃO</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaBody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3">TOTAL</td>
+              <td id="totalHoras">0h</td>
+              <td id="totalValor">R$ 0,00</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <button id="btnPDF"><i class="fas fa-download"></i> Baixar Relatório PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    let TABELA = [], VALORES = {};
+    const moeda = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    const pad2 = n => String(n).padStart(2,'0');
+    const diaSemana = (d)=>["domingo","segunda","terça","quarta","quinta","sexta","sábado"][new Date(d+"T00:00:00").getDay()];
+    const duracao = (ini,fim)=>(ini===fim?24:(fim-ini+24)%24);
+    const chaveFaixa=(i,f)=>`${pad2(i)}h_as_${pad2(f)}h_(${pad2(duracao(i,f))}h)`;
+
+    // IMPORTANTE: Insira aqui a string Base64 do seu brasão para que o PDF funcione
+    const logoBase64 = ""; 
+
+    function calcularValor(data, ini, fim){
+      const dia = diaSemana(data);
+      const key = chaveFaixa(ini,fim);
+      if(!VALORES.valores) return 0;
+      const faixa = VALORES.valores[key];
+      if(faixa && faixa[dia]!==undefined) return faixa[dia];
+      return 0;
+    }
+
+    function atualizarTextoFim(){
+      const ini=parseInt(document.getElementById('horaInicio').value);
+      const fim=parseInt(document.getElementById('horaFim').value);
+      document.getElementById('textoFim').textContent=`até ${pad2(fim)}h (${duracao(ini,fim)}h)`;
+    }
+    
+    function atualizarPreview(){
+      const data=document.getElementById('data').value;
+      const ini=parseInt(document.getElementById('horaInicio').value);
+      const fim=parseInt(document.getElementById('horaFim').value);
+      if(!data) return;
+      const valor=calcularValor(data,ini,fim);
+      document.getElementById('previewValor').textContent=moeda(valor);
+      document.getElementById('previewInfo').textContent=`${data} (${diaSemana(data)}) — ${pad2(ini)}h às ${pad2(fim)}h`;
+    }
+    
+    function renderTabela(){
+      let totH=0,totV=0;const body=document.getElementById('tabelaBody');body.innerHTML="";
+      TABELA.forEach((c,i)=>{
+        totH+=c.horas;totV+=c.valor;
+        body.innerHTML+=`
+          <tr>
+            <td>${c.data}</td>
+            <td style="text-transform: capitalize;">${c.dia}</td>
+            <td>${pad2(c.inicio)}h às ${pad2(c.fim)}h</td>
+            <td><strong>${c.horas}h</strong></td>
+            <td style="color: var(--verde); font-weight: 600;">${moeda(c.valor)}</td>
+            <td><button class="btn-del" onclick="remover(${i})"><i class="fas fa-trash-alt"></i></button></td>
+          </tr>`;
+      });
+      document.getElementById('totalHoras').textContent=totH+"h";
+      document.getElementById('totalValor').textContent=moeda(totV);
+    }
+    
+    function remover(i){TABELA.splice(i,1);renderTabela();atualizarPreview();}
+    
+    function adicionar(){
+      const data=document.getElementById('data').value;
+      const ini=parseInt(document.getElementById('horaInicio').value);
+      const fim=parseInt(document.getElementById('horaFim').value);
+      const valor=calcularValor(data,ini,fim);
+      TABELA.push({data,dia:diaSemana(data),inicio:ini,fim,horas:duracao(ini,fim),valor});
+      renderTabela();
+    }
+    
+    document.getElementById('btnMais').onclick=()=>{let f=document.getElementById('horaFim');f.value=(parseInt(f.value)+1)%24;atualizarTextoFim();atualizarPreview();}
+    document.getElementById('btnMenos').onclick=()=>{let f=document.getElementById('horaFim');f.value=(parseInt(f.value)+23)%24;atualizarTextoFim();atualizarPreview();}
+    document.getElementById('horaInicio').onchange=()=>{atualizarTextoFim();atualizarPreview();}
+    document.getElementById('data').onchange=atualizarPreview;
+    document.getElementById('btnAdd').onclick=adicionar;
+
+    document.getElementById('btnPDF').onclick=()=>{
+      const { jsPDF } = window.jspdf;
+      const doc=new jsPDF();
+
+      // Tratamento de erro caso o Base64 esteja vazio
+      if (logoBase64) {
+        try {
+          doc.addImage(logoBase64, "PNG", 85, 10, 40, 40);
+        } catch(e) {
+          console.error("Erro ao carregar o brasão base64:", e);
+        }
+      }
+      
+      doc.setFontSize(16);
+      doc.setTextColor(0, 107, 60);
+      doc.text("Calculadora AC4 – 5° CRPM", 105, 60, { align: "center" });
+
+      doc.setFontSize(12);
+      doc.setTextColor(0,0,0);
+
+      let y=80,totH=0,totV=0;
+      TABELA.forEach(c=>{
+        doc.text(`${c.data} (${c.dia}) - ${pad2(c.inicio)}h às ${pad2(c.fim)}h - ${c.horas}h - ${moeda(c.valor)}`,20,y);
+        y+=10;
+        if(y>270){ doc.addPage(); y=20; }
+        totH+=c.horas; totV+=c.valor;
+      });
+
+      doc.setFontSize(13);
+      doc.setTextColor(193,18,31);
+      doc.text(`TOTAL: ${totH}h - ${moeda(totV)}`,20,y+10);
+
+      doc.save("relatorio_AC4.pdf");
+    }
+
+    (async function init(){
+      try {
+        const resp=await fetch("valores.json");
+        VALORES=await resp.json();
+      } catch(e) {
+        console.warn("valores.json não encontrado. Certifique-se de que o ficheiro existe.");
+      }
+      
+      for(let h=0;h<24;h++){
+        let o=document.createElement("option");
+        o.value=h;
+        o.textContent=pad2(h)+"h";
+        document.getElementById("horaInicio").appendChild(o);
+      }
+      document.getElementById('horaInicio').value=0;
+      document.getElementById('horaFim').value=8;
+      const hoje=new Date();
+      document.getElementById('data').value=hoje.toISOString().split('T')[0];
+      atualizarTextoFim();
+      atualizarPreview();
+    })();
+  </script>
+</body>
+</html>
